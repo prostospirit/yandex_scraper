@@ -14,17 +14,16 @@ from ..items import YandexReviewsParserItem
 class ReviewsSpider(scrapy.Spider):
     name = 'yandex'
     allowed_domains = ['yandex.by']
-    # f = open("urls.txt")
-    # start_urls = [url.strip() for url in f.readlines()]
-    # f.close()
-    start_urls = ['https://yandex.by/maps/org/sosedi/1042256439/']
-    file_format = 'json'
+    f = open("urls.txt")
+    start_urls = [url.strip() for url in f.readlines()]
+    f.close()
+    #file_format = 'json'
     custom_settings = {
         'LOG_FILE': f'logs/{name}.log',
-        'LOG_LEVEL': 'DEBUG',  # INFO DEBUG
-        'FEED_EXPORT_ENCODING': 'UTF-8',
-        'FEED_FORMAT': file_format,
-        'FEED_URI': f'results/{name}.{file_format}',
+        'LOG_LEVEL': 'INFO',  # INFO DEBUG
+        # 'FEED_EXPORT_ENCODING': 'UTF-8',
+        # 'FEED_FORMAT': file_format,
+        # 'FEED_URI': f'results/{name}.{file_format}',
     }
 
     def __init__(self, **kwargs):
@@ -48,7 +47,9 @@ class ReviewsSpider(scrapy.Spider):
                              f"ranking=by_relevance_org&reqId={param['reqId']}&" \
                              f"s={param['s']}&sessionId={param['sessionId']}"
 
-            yield response.follow(url=api_review_url, callback=self.parse_reviews, cb_kwargs={'api_key': param['api_key']})
+            yield response.follow(url=api_review_url, callback=self.parse_reviews,
+                                  cb_kwargs={'api_key': param['api_key']},
+                                  errback=self.errback_httpbin)
 
     def parse_reviews(self, response, api_key):
         reviews = json.loads(response.text)
@@ -77,7 +78,8 @@ class ReviewsSpider(scrapy.Spider):
                     comments_url = f'https://yandex.by/comments/api/v1/tree?stats={self.stats}' \
                                    f'&entityId={review["reviewId"]}' \
                                    f'&sid={self.sid}&allowAbsent=true&supplierServiceSlug=ugc'
-                    request = scrapy.Request(url=comments_url, callback=self.parse_comments, headers=headers)
+                    request = scrapy.Request(url=comments_url, callback=self.parse_comments, headers=headers,
+                                             errback=self.errback_httpbin)
                     request.meta['item'] = item
 
                     yield request
@@ -92,7 +94,7 @@ class ReviewsSpider(scrapy.Spider):
                 comment = dict()
                 comment['id'] = key
                 comment['user'] = val['user']['displayName'] if 'user' in val else None
-                comment['text'] = [el['text'] for el in val['content'] if el['type']!='cut']
+                comment['text'] = [el['text'] for el in val['content'] if el['type'] != 'cut']
                 comment['parent_id'] = val['reply']['id'] if 'reply' in val else None
                 comment['isOfficial'] = val['isOfficial'] if 'isOfficial' in val else None
                 item['comments'].append(comment)
