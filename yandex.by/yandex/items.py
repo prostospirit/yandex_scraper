@@ -10,18 +10,10 @@ import scrapy
 
 
 class YandexReviewsParserItem(scrapy.Item):
-    # name = scrapy.Field()
-    review_id = scrapy.Field()
+    id = scrapy.Field()
     data = scrapy.Field()
-    review_text = scrapy.Field()
-    review_author = scrapy.Field()
-    review_date = scrapy.Field()
+    text = scrapy.Field()
+    author = scrapy.Field()
+    date = scrapy.Field()
     rating = scrapy.Field()
-    # parent_id = scrapy.Field()
-
-
-class YandexReviewsCommentParserItem(scrapy.Item):
-    review_id = scrapy.Field()  # link to review
-    comment_id = scrapy.Field()
-    comment_text = scrapy.Field()
-    is_official = scrapy.Field()
+    comments = scrapy.Field()
