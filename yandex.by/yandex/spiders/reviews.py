@@ -4,19 +4,24 @@ import js2py
 import json
 import math
 import logging
+import os
 
+from scrapy.utils.project import get_project_settings
 from scrapy.spidermiddlewares.httperror import HttpError
 from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..items import YandexReviewsParserItem
 
 def get_urls():
-    with open("urls.txt", "r") as f:
+    settings = get_project_settings()
+    with open(settings['ABS_URLS_PATH'], "r") as f:
         return [url.strip() for url in f.readlines()]
 
 class ReviewsSpider(scrapy.Spider):
+
     name = 'yandex'
     allowed_domains = ['yandex.by']
+
     start_urls = get_urls()
     #file_format = 'json'
     custom_settings = {

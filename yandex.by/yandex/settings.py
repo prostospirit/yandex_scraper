@@ -6,6 +6,10 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
+from pathlib import Path
+
+ABS_URLS_PATH = Path(os.path.dirname(__file__)) / Path('spiders/urls.txt')
 
 BOT_NAME = 'yandex'
 
@@ -18,7 +22,7 @@ MONGODB_PORT = 27017
 MONGODB_DB = "yandex_maps"
 MONGODB_COLLECTION = "reviews"
 
-DOWNLOAD_DELAY = 1.5
+DOWNLOAD_DELAY = 4
 AUTOTHROTTLE_ENABLED = True
 AUTOTHROTTLE_START_DELAY = 2
 AUTOTHROTTLE_TARGET_CONCURRENCY = 6
