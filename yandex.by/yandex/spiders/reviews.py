@@ -124,6 +124,7 @@ class ReviewsSpider(scrapy.Spider):
 
         """This js function I retrieved from the source code from the page of a Yandex-cards 
                 and specifically have not changed. Guided by the principle "works - do not touch"""
+
         f = js2py.eval_js("function (e) {for (var t = e.length, n = 5381, r = 0; r < t; r++) "
                           "{n = 33 * n ^ e.charCodeAt(r);} "
                           "return n >>> 0}")
