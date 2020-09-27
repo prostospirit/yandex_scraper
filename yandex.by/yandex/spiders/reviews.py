@@ -10,13 +10,14 @@ from twisted.internet.error import DNSLookupError
 from twisted.internet.error import TimeoutError, TCPTimedOutError
 from ..items import YandexReviewsParserItem
 
+def get_urls():
+    with open("urls.txt", "r") as f:
+        return [url.strip() for url in f.readlines()]
 
 class ReviewsSpider(scrapy.Spider):
     name = 'yandex'
     allowed_domains = ['yandex.by']
-    f = open("urls.txt")
-    start_urls = [url.strip() for url in f.readlines()]
-    f.close()
+    start_urls = get_urls()
     #file_format = 'json'
     custom_settings = {
         'LOG_FILE': f'logs/{name}.log',
@@ -120,6 +121,9 @@ class ReviewsSpider(scrapy.Spider):
         e = f"ajax=1&businessId={param['businessId']}&csrfToken={param['csrfToken'].replace(':', '%3A')}" \
             f"&page={param['page']}&pageSize={self.page_size}&ranking=by_relevance_org" \
             f"&reqId={param['reqId']}&sessionId={param['sessionId']}"
+
+        """This js function I retrieved from the source code from the page of a Yandex-cards 
+                and specifically have not changed. Guided by the principle "works - do not touch"""
         f = js2py.eval_js("function (e) {for (var t = e.length, n = 5381, r = 0; r < t; r++) "
                           "{n = 33 * n ^ e.charCodeAt(r);} "
                           "return n >>> 0}")
@@ -138,3 +142,4 @@ class ReviewsSpider(scrapy.Spider):
                  'api_key': api_key, 'review_count': int(review_count)}
 
         return param
+
